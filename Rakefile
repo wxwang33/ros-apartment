@@ -62,7 +62,7 @@ namespace :postgres do
     params = []
     params << '-E UTF8'
     params << pg_config['database']
-    params << "-U#{pg_config['username']}"
+    params << "-U#{pg_config['username']}" if pg_config['username']
     params << "-h#{pg_config['host']}" if pg_config['host']
     params << "-p#{pg_config['port']}" if pg_config['port']
 
@@ -80,7 +80,7 @@ namespace :postgres do
     puts "dropping database #{pg_config['database']}"
     params = []
     params << pg_config['database']
-    params << "-U#{pg_config['username']}"
+    params << "-U#{pg_config['username']}" if pg_config['username']
     params << "-h#{pg_config['host']}" if pg_config['host']
     params << "-p#{pg_config['port']}" if pg_config['port']
     `dropdb #{params.join(' ')}`

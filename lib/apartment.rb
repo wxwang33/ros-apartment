@@ -17,6 +17,24 @@ if ActiveRecord.version.release >= Gem::Version.new('6.1')
   require_relative 'apartment/active_record/internal_metadata'
 end
 
+if ActiveRecord.version.release >= Gem::Version.new('7.0')
+  module Rails7EnumPatch
+    def enum_types
+      super.map {|name, value| [name, value.split(",").uniq.join(",")]}
+    end
+
+    def create_enum(name, values)
+      execute("CREATE TYPE #{name} AS ENUM (#{Array(values).map { |v| "'#{v}'" }.join(", ")})").tap {
+        reload_type_map
+      }
+    end
+  end
+
+  class ActiveRecord::ConnectionAdapters::PostgreSQLAdapter < ActiveRecord::ConnectionAdapters::AbstractAdapter
+    prepend Rails7EnumPatch
+  end
+end
+
 # Apartment main definitions
 module Apartment
   class << self
